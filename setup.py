@@ -45,21 +45,17 @@ setup(
     packages=_packages,
     package_dir={'': 'drdocs'},
 
-    description="Python tool to meansure documentation coverage",
+    description="Python tool to measure documentation coverage",
     # long_description='',
     license='GPLv2',
     zip_safe=False,
 
     install_requires=_get_reqs(),
 
-    data_files=[('', ['requirements.txt']), ]
+    data_files=[('', ['requirements.txt']), ],
+    entry_points={
+        'console_scripts': [
+            'drdocs = drdocs.entry:run',
+        ],
+    },
 )
-
-
-
-# keywords='pylint pyflakes pep8 mccabe frosted prospector static code analysis',
-# classifiers=_CLASSIFIERS,
-                 # 'console_scripts': [
-                 #     'prospector = prospector.run:main',
-                 #     ],
-                 # },
