@@ -1,0 +1,14 @@
+
+
+priority
+
+
+grade also based on style?
+
+TODO
+
+bad format for docutils?
+undocumented
+single line for complex method
+ mccabe:
+  - complex methods should be documented with not just one line
