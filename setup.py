@@ -5,7 +5,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 _version = "0.1"
-_packages = find_packages('drdocs', exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
+_packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 
 
 def _strip_comments(line):
@@ -43,10 +43,8 @@ setup(
     version=_version,
 
     packages=_packages,
-    package_dir={'': 'drdocs'},
 
     description="Python tool to measure documentation coverage",
-    # long_description='',
     license='GPLv2',
     zip_safe=False,
 
