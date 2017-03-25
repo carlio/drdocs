@@ -1,4 +1,4 @@
 doc-warnings: true
 test-warnings: false
 ignore-paths:
-  example.py
+  - example.py

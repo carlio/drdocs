@@ -26,7 +26,7 @@ def _read(filepath):
         with open(filepath, 'rU') as f:
             return f.read()
     elif (3, 0) <= sys.version_info < (4, 0):
-        """Read the source code."""
+        # Read the source code.
         try:
             with open(filepath, 'rb') as f:
                 (encoding, _) = tokenize.detect_encoding(f.readline)
@@ -40,6 +40,8 @@ def _read(filepath):
 
 def parse_file(filepath):
     """
+    Parse a file to find the various aspects of it to be considered by this library.
+
     Given a filepath which is assumed to be a python module, separate it into the various
     things which can be documented and attached any relevant comments and documentation to it.
 
@@ -52,6 +54,8 @@ def parse_file(filepath):
 
 def parse_code(source, filepath):
     """
+    Parse some code into its constituent Thing objects.
+
     Parse a string containing Python source into the various Thing objects that it represents
     and are interesting to this library.
 
