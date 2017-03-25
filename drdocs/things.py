@@ -1,5 +1,26 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import ast
+
+
+SEVERITIES = (
+    'GOOD_DOCS',
+    'INSUFFICIENT_DOCS',
+    'NO_DOCS'
+)
+
+
+class Message(object):
+    """
+    Represents a message to be conveyed to the user of this library
+    """
+    def __init__(self, thing, severity, message_text):
+        self.thing = thing
+        self.severity = severity
+        self.message_text = message_text
+
+    def __repr__(self):
+        return self.message_text
 
 
 class DocableThing(object):
@@ -9,21 +30,20 @@ class DocableThing(object):
     a general class to collect common information such as location and fully qualified
     name of that thing.
     """
-    def __init__(self, filepath, line_number, char_number, fqn):
+    def __init__(self, filepath, node):
         """
         Generic constructor for a Python "Thing" which is documentable.
 
         Args:
-          filepath(str): the relative path to where this thing was found
-          line_number(int): the line in the file where this thing was found
-          char_number(int): the character position on the line in which this thing begins
-          fqn(str): some kind of identifier which would allow a user to figure out where this
-                    thing is in their code - for example, module.SomeClass.attribute_name
+          filepath(str): the relative path to where this thing was found. May or may
+                         not be known if this is just being parsed from a simple string object.
+          node(asttoken.Node): An annotated node which is very similar to an ast module node but
+                               also has location information of the first and last token making up
+                               this node.
         """
         self.filepath = filepath
-        self.line_number = line_number
-        self.char_number = char_number
-        self.fqn = fqn
+        self.node = node
+        self.docstring = ast.get_docstring(node)
 
     def get_doc_status(self, config):
         """
@@ -69,24 +89,14 @@ class ClassAttribute(DocableThing):
     pass
 
 
-class MethodOrFunction(object):
+class MethodOrFunction(DocableThing):
     """
     Represents either a method or a function. This can be a module-level function, a
     class method or static method. Or an inline function. Anything.
     """
 
     def __init__(self, filepath, node):
-        """
-        Args:
-          filepath(str): The file containing the definition of this method or function. May or may
-                         not be known if this is just being parsed from a simple string object.
-          node(asttoken.Node): An annotated node which is very similar to an ast module node but
-                                also has location information of the first and last token making up
-                                this node.
-        """
-        self.filepath = filepath
-        self.node = node
-        self.docstring = ast.get_docstring(node)
+        super(MethodOrFunction, self).__init__(filepath, node)
         self.complexity = None
         self.comments = []
 
@@ -104,15 +114,17 @@ class MethodOrFunction(object):
         # it is currently simply a case of any comment at any level of indentation in the scope of this
         # node is taken note of.
         comment_line = token[2][0]
-        if comment_line <= self.node.first_token.start[0]:
-            # this comment is before this method/func, abort
-            return
-        if comment_line >= self.node.last_token.end[0]:
-            # this comment is after this method/func, abort
-            return
-        self.comments.append(token)
+        if self.node.first_token.start[0] <= comment_line <= self.node.last_token.end[0]:
+            self.comments.append(token)
 
-    def _print_docs(self):
-        print self.docstring
-        for c in self.comments:
-            print c[1]
+    def get_messages(self):
+        messages = []
+        if not self.docstring:
+            messages.append(Message(self, 'INSUFFICIENT_DOCS',
+                                    'No docstring for this method/function'))
+
+        # TODO: sufficient docs per complexity and also docstring or not depending on complexity should be configurable
+        if self.complexity > 3 and (len(self.comments) / self.complexity) < (1/3):
+            messages.append(Message(self, 'INSUFFICIENT_DOCS',
+                            'This method or function is complex but does not have a lot of comments'))
+        return messages

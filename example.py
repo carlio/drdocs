@@ -12,7 +12,10 @@ def fartypants(a, b, c):
     elif b != 5:
         return c
     else:
-        return a * b + c
+        if a > c:
+            return b
+        else:
+            return a * b + c
 
 
 class Banana(object):

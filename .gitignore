@@ -47,8 +47,4 @@ media
 .env
 *.iml
 todo.txt
-landscape-tickets.txt
-celerybeat-schedule
-celerybeat-schedule.bak
-celerybeat-schedule.dat
-celerybeat-schedule.dir
+notes.txt
